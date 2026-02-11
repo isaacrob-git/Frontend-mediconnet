@@ -121,22 +121,26 @@
     </div>
 </section>
 
-<section id="nosotros" class="py-24 bg-off_white">
-    <div class="max-w-[1200px] mx-auto px-6">
-        <div class="flex flex-col md:flex-row gap-12">
-            <div class="md:w-1/3">
-                <h2 class="text-[32px] font-bold text-navy_dark leading-tight">Nuestra esencia institucional</h2>
-                <p class="text-neutral_text mt-4 font-medium">En MediConnect C.A., la tecnología no es el fin, sino el medio para cuidar de lo más importante: tu vida.</p>
+<section id="nosotros" class="py-24 bg-off_white px-6">
+    <div class="max-w-[1200px] mx-auto flex flex-col lg:flex-row gap-12 items-center">
+        <div class="lg:w-1/4">
+            <h2 class="text-[32px] font-bold text-navy_dark leading-tight">Nuestra esencia institucional</h2>
+            <p class="text-neutral_text mt-4 font-medium">En MediConnect C.A., la tecnología no es el fin, sino el medio para cuidar de lo más importante: tu vida.</p>
+        </div>
+
+        <div class="lg:w-3/4 grid sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+            <div class="bg-white p-8 rounded-card shadow-sm border border-gray-100">
+                <h3 class="text-[20px] font-bold text-navy_dark mb-3">Misión</h3>
+                <p class="text-neutral_text text-sm leading-relaxed">Conectar a pacientes y médicos mediante tecnología segura y accesible, garantizando atención médica de calidad a distancia.</p>
             </div>
-            <div class="md:w-2/3 grid sm:grid-cols-2 gap-8">
-                <div class="bg-white p-8 rounded-card shadow-sm border border-gray-100">
-                    <h3 class="text-[20px] font-bold text-navy_dark mb-3">Misión</h3>
-                    <p class="text-neutral_text text-sm leading-relaxed">Brindar soluciones tecnológicas innovadoras que faciliten el acceso a servicios médicos de calidad mediante la atención remota...</p>
-                </div>
-                <div class="bg-white p-8 rounded-card shadow-sm border border-gray-100">
-                    <h3 class="text-[20px] font-bold text-navy_dark mb-3">Visión</h3>
-                    <p class="text-neutral_text text-sm leading-relaxed">Consolidarse como la plataforma líder en telemedicina en América Latina, reconocida por su compromiso con la innovación...</p>
-                </div>
+
+            <div class="bg-white p-8 rounded-card shadow-sm border border-gray-100">
+                <h3 class="text-[20px] font-bold text-navy_dark mb-3">Visión</h3>
+                <p class="text-neutral_text text-sm leading-relaxed">Ser el referente de telemedicina en América Latina, impulsando un sistema de salud digital más humano, eficiente y sostenible.</p>
+            </div>
+
+            <div class="bg-white p-2 rounded-card shadow-sm border border-gray-100 flex items-center justify-center overflow-hidden">
+                <img src="logo1.png" alt="Logo MediConnect" class="w-full h-full object-contain min-h-[180px] transform hover:scale-105 transition-transform duration-300">
             </div>
         </div>
     </div>
@@ -322,6 +326,35 @@ function logout() {
     localStorage.removeItem('user');
     window.location.href = 'index.html';
 }
+
+    const nav = document.getElementById('mainNav');
+    const navTitle = document.getElementById('navTitle');
+    const btnLogin = document.getElementById('btnLogin');
+    const navLinks = document.querySelectorAll('#navLinks a:not(.bg-brand_lime):not(#btnLogin)');
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            nav.classList.add('bg-white', 'backdrop-blur-md', 'shadow-md');
+            navTitle.style.color = '#102A32'; 
+            btnLogin.style.color = '#102A32';
+            btnLogin.style.borderColor = 'rgba(16, 42, 50, 0.2)';
+            navLinks.forEach(link => { link.style.color = '#102A32'; });
+        } else {
+            nav.classList.remove('bg-white', 'backdrop-blur-md', 'shadow-md');
+            navTitle.style.color = '#FFFFFF';
+            btnLogin.style.color = '#FFFFFF';
+            btnLogin.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            navLinks.forEach(link => { link.style.color = 'rgba(255, 255, 255, 0.9)'; });
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+        window.location.href = "main-users.html";
+    }
+});
 
 </script>
 
