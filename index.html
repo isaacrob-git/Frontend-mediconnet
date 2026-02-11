@@ -297,6 +297,15 @@
             navLinks.forEach(link => { link.style.color = 'rgba(255, 255, 255, 0.9)'; });
         }
     });
+
+    document.addEventListener("DOMContentLoaded", () => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+        window.location.href = "main-users.html";
+    }
+});
+
 </script>
 
 </body>

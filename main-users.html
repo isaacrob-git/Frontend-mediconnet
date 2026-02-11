@@ -257,117 +257,11 @@
 </footer>
 
 <script>
-    const nav = document.getElementById('mainNav');
-    const navTitle = document.getElementById('navTitle');
-    const navLinks = document.querySelectorAll('#navLinks a');
-    const userBtnShell = document.getElementById('userBtnShell');
-    const userMenu = document.getElementById('userMenu');
 
-    // Cargar datos de usuario
-    function loadUserData() {
-        const name = localStorage.getItem('userName') || 'Usuario';
-        const email = localStorage.getItem('userEmail') || 'usuario@correo.com';
-        document.getElementById('userNameNav').innerText = name.split(' ')[0];
-        document.getElementById('profileName').innerText = name;
-        document.getElementById('profileEmail').innerText = email;
-        document.getElementById('userAvatar').innerText = name.charAt(0).toUpperCase();
-    }
+document.addEventListener("DOMContentLoaded", async () => {
 
-    function toggleUserMenu() {
-        userMenu.classList.toggle('hidden');
-    }
-
-    function logout() {
-        localStorage.clear();
-        window.location.href = 'login.html';
-    }
-
-    window.addEventListener('scroll', () => {
-        const isScrolling = window.scrollY > 50;
-        nav.classList.toggle('bg-white', isScrolling);
-        nav.classList.toggle('shadow-md', isScrolling);
-        navTitle.style.color = isScrolling ? '#102A32' : '#FFFFFF';
-        userBtnShell.classList.toggle('text-navy_dark', isScrolling);
-        userBtnShell.classList.toggle('text-white', !isScrolling);
-        navLinks.forEach(link => {
-            link.style.color = isScrolling ? '#102A32' : 'rgba(255, 255, 255, 0.9)';
-        });
-    });
-
-    // Cerrar menú al hacer clic fuera
-    window.addEventListener('click', (e) => {
-        if (!userBtnShell.contains(e.target) && !userMenu.contains(e.target)) {
-            userMenu.classList.add('hidden');
-        }
-    });
-
-    loadUserData();
-
-    function toggleUserMenu(){
-    const menu = document.getElementById('userMenu');
-    menu.classList.toggle('hidden');
-}
-
-// Cerrar menú al hacer click fuera
-document.addEventListener('click', (e)=>{
-    const menu = document.getElementById('userMenu');
-    const avatar = document.getElementById('userAvatar');
-    if(!menu || !avatar) return;
-    if(!menu.contains(e.target) && !avatar.parentElement.contains(e.target)){
-        menu.classList.add('hidden');
-    }
-});
-
-// Cargar datos del usuario
-function loadUserNav(){
-    const user = JSON.parse(localStorage.getItem('user'));
-    if(!user) return;
-
-    document.getElementById('userNameNav').innerText = user.name;
-    document.getElementById('profileName').innerText = user.name;
-    document.getElementById('profileEmail').innerText = user.email;
-
-    // Avatar con iniciales
-    const initials = user.name.split(' ').map(w=>w[0]).join('').substring(0,2);
-    document.getElementById('userAvatar').innerText = initials;
-}
-
-function logout(){
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = 'login.html';
-}
-
-loadUserNav();
-
-// Supongamos que tu token contiene info del usuario o la recuperas de tu API
-    const user = JSON.parse(localStorage.getItem('user')) || {}; // { name, email, role }
-
-    // Mostrar botón solo si es admin
-    if(user.role === 'admin') {
-        document.getElementById('adminInventoryBtn').classList.remove('hidden');
-    }
-
-    // Función toggle menu
-    function toggleUserMenu() {
-        const menu = document.getElementById('userMenu');
-        menu.classList.toggle('hidden');
-    }
-
-    // Función logout
-    function logout() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = 'login.html';
-    }
-
-    // Inicializar info del usuario
-    document.getElementById('userNameNav').innerText = user.name || 'Usuario';
-    document.getElementById('profileName').innerText = user.name || 'Nombre Usuario';
-    document.getElementById('profileEmail').innerText = user.email || 'usuario@correo.com';
-
-    async function checkAuth() {
     const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
 
     if (!token) {
         window.location.href = 'index.html';
@@ -378,8 +272,7 @@ loadUserNav();
         const res = await fetch('https://backend-mediconnet.onrender.com/api/auth/profile', {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                'Authorization': `Bearer ${token}`
             }
         });
 
@@ -389,20 +282,49 @@ loadUserNav();
             return;
         }
 
-        const user = await res.json();
-        console.log('Usuario autenticado:', user);
-
-        // 👉 Mostrar la página SOLO si pasó la validación
+        // Mostrar página solo si está autenticado
         document.getElementById('appBody').classList.remove('hidden');
+
+        // Cargar datos del usuario
+        if (user) {
+            document.getElementById('userNameNav').innerText = user.name;
+            document.getElementById('profileName').innerText = user.name;
+            document.getElementById('profileEmail').innerText = user.email;
+
+            const initials = user.name
+                .split(' ')
+                .map(w => w[0])
+                .join('')
+                .substring(0, 2);
+
+            document.getElementById('userAvatar').innerText = initials;
+
+            if (user.role === 'admin') {
+                document.getElementById('adminInventoryBtn')
+                    .classList.remove('hidden');
+            }
+        }
 
     } catch (error) {
         localStorage.clear();
         window.location.href = 'index.html';
     }
+});
+
+// Toggle menú
+function toggleUserMenu() {
+    document.getElementById('userMenu').classList.toggle('hidden');
 }
 
-    checkAuth();
+// Logout
+function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = 'index.html';
+}
+
 </script>
+
 
 </body>
 </html>
