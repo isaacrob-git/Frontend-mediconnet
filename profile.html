@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil | MediConnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand_lime: '#D1F09B',
+                        brand_lime_dark: '#B8E07D',
+                        navy_dark: '#102A32',
+                        navy_deep: '#0A1F26',
+                        off_white: '#F8FAFC'
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-off_white text-navy_dark min-h-screen">
+
+<nav class="bg-navy_dark text-white py-4 px-8 sticky top-0 z-50 shadow-md">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+        <a href="main-users.html" class="flex items-center gap-2 hover:text-brand_lime transition">
+            <span class="text-white font-bold text-xl tracking-tighter">Medi<span class="text-brand_lime font-light">Connect</span></span>
+        </a>
+        <h1 class="font-black tracking-tighter text-lg uppercase">MediConnect <span class="text-brand_lime">ID</span></h1>
+    </div>
+</nav>
+
+<main class="max-w-4xl mx-auto p-6 md:p-12">
+    <div class="bg-white rounded-[40px] shadow-2xl shadow-navy_dark/5 border border-gray-100 overflow-hidden">
+        
+        <div class="bg-navy_dark p-10 text-white flex flex-col md:flex-row items-center gap-6 border-b-4 border-brand_lime">
+            <div id="userInitials" class="w-24 h-24 bg-brand_lime rounded-3xl flex items-center justify-center text-navy_dark text-3xl font-black shadow-lg">
+                U
+            </div>
+            <div class="text-center md:text-left">
+                <h2 id="displayFullName" class="text-3xl font-black leading-tight tracking-tight">Cargando...</h2>
+                <p id="displayEmail" class="opacity-60 text-sm font-medium">usuario@correo.com</p>
+            </div>
+        </div>
+
+        <div class="p-10 space-y-8">
+            <div class="bg-gray-50 p-4 rounded-2xl flex items-center justify-between border border-gray-100">
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Nivel de Acceso</span>
+                <span id="displayRole" class="text-xs font-black text-navy_dark bg-brand_lime px-3 py-1 rounded-full uppercase">Cargando...</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Nombre</label>
+                    <p id="nombre" class="w-full bg-gray-50 border border-transparent rounded-2xl py-3.5 px-4 font-bold text-navy_dark text-sm">---</p>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Apellido</label>
+                    <p id="apellido" class="w-full bg-gray-50 border border-transparent rounded-2xl py-3.5 px-4 font-bold text-navy_dark text-sm">---</p>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Correo Electrónico</label>
+                    <p id="email" class="w-full bg-gray-50 border border-transparent rounded-2xl py-3.5 px-4 font-bold text-navy_dark text-sm">---</p>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">País de Residencia</label>
+                    <p id="pais" class="w-full bg-gray-50 border border-transparent rounded-2xl py-3.5 px-4 font-bold text-navy_dark text-sm">Venezuela</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+const API_URL = 'https://backend-mediconnet.onrender.com/api';
+const token = localStorage.getItem('token');
+
+// Protección de ruta
+if (!token) {
+    window.location.href = 'login.html';
+}
+
+// =====================
+// CARGAR PERFIL
+// =====================
+async function loadData() {
+    try {
+        const res = await fetch(`${API_URL}/auth/profile`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error('Error al cargar perfil');
+
+        const user = await res.json();
+
+        // Actualizar Header
+        document.getElementById('displayFullName').innerText = user.name;
+        document.getElementById('displayEmail').innerText = user.email;
+        document.getElementById('userInitials').innerText = user.name.charAt(0).toUpperCase();
+        document.getElementById('displayRole').innerText =
+            user.role === 'admin' ? 'Administrador' :
+            user.role === 'medico' ? 'Médico' : 'Usuario Verificado';
+
+        // Actualizar Datos
+        const nombres = user.name.split(' ');
+        document.getElementById('nombre').innerText = nombres[0] || '---';
+        document.getElementById('apellido').innerText = nombres.slice(1).join(' ') || '---';
+        document.getElementById('email').innerText = user.email;
+
+        // País siempre Venezuela
+        document.getElementById('pais').innerText = 'Venezuela';
+
+    } catch (err) {
+        console.error(err);
+        alert('Error al obtener la información del perfil');
+    }
+}
+
+// Ejecutar al cargar
+loadData();
+</script>
+</body>
+</html>

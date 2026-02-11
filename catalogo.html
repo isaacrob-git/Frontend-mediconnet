@@ -1,0 +1,387 @@
+<!DOCTYPE html>  
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo | MediConnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand_lime: '#D1F09B',
+                        brand_lime_dark: '#B8E07D',
+                        navy_dark: '#102A32',
+                        navy_deep: '#0A1F26',
+                        off_white: '#F4F4F2',
+                        danger: '#EF4444'
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #F8FAFC; }
+        .glass-nav { 
+            background: rgba(16, 42, 50, 0.95); 
+            backdrop-filter: blur(12px); 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+        }
+        .product-card { 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            border: 1px solid rgba(0,0,0,0.03); 
+        }
+        .product-card:hover { 
+            transform: translateY(-6px); 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08); 
+            border-color: #D1F09B; 
+        }
+        .img-container { 
+            background: radial-gradient(circle at center, #ffffff, #f1f5f9); 
+        }
+        #cartItems::-webkit-scrollbar { width: 4px; }
+        #cartItems::-webkit-scrollbar-thumb { background: #D1F09B; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-navy_dark">
+
+<nav class="glass-nav fixed top-0 w-full z-50 px-6 py-4 text-white">
+    <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div class="flex items-center gap-6 w-full md:w-auto justify-between">
+            <a href="main-users.html" class="flex items-center gap-3 hover:text-brand_lime transition">
+                <span class="font-bold text-xl tracking-tight">MediConnect <span class="text-brand_lime font-light">Store</span></span>
+            </a>
+            <button class="md:hidden relative p-2 bg-white/10 rounded-full" onclick="toggleCart()">
+                <span class="text-xl">🛒</span>
+                <span id="cartCountMobile" class="absolute -top-1 -right-1 bg-brand_lime text-navy_dark text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-lg">0</span>
+            </button>
+        </div>
+
+        <div class="w-full md:max-w-md relative group">
+            <input type="text" id="searchInput" placeholder="Buscar por nombre o código" 
+                class="w-full bg-white/10 border border-white/20 rounded-2xl py-2.5 pl-10 pr-4 text-sm text-white placeholder-white/40 focus:outline-none focus:border-brand_lime focus:bg-white/20 transition-all">
+            <span class="absolute left-3.5 top-2.5 text-white/40 group-focus-within:text-brand_lime transition-colors"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5"> <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd" /> </svg></span>
+        </div>
+
+        <div class="hidden md:flex items-center gap-2 ml-3">
+    <!-- BOTÓN CARRITO -->
+    <button class="flex items-center gap-3 bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-2xl transition border border-white/10 group" onclick="toggleCart()">
+        <span class="text-lg group-hover:scale-110 transition-transform"></span>
+        <span class="font-bold text-sm">Tu Carrito</span>
+        <span id="cartCountDesktop" class="bg-brand_lime text-navy_dark text-[11px] font-black px-2.5 py-0.5 rounded-full shadow-sm">0</span>
+    </button>
+
+    <!-- BOTÓN USUARIO -->
+    <div class="relative">
+        <button onclick="toggleUserMenu()" class="flex items-center gap-2 p-1 pr-3 bg-white/5 hover:bg-white/10 rounded-full transition border border-white/10">
+            <div id="userAvatar" class="w-8 h-8 bg-brand_lime_dark rounded-full flex items-center justify-center text-navy_dark font-bold text-xs uppercase"></div>
+            <span id="userNameNav" class="text-xs font-bold hidden md:inline">Cargando...</span>
+        </button>
+
+        <div id="userMenu" class="hidden absolute right-0 mt-3 w-64 bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 text-navy_dark z-[100]">
+            <div class="p-6 bg-navy_dark text-white">
+                <p class="text-[10px] font-black text-brand_lime uppercase tracking-[0.2em] mb-1">Bienvenido</p>
+                <h4 id="profileName" class="font-bold text-lg leading-tight truncate">Nombre Usuario</h4>
+                <p id="profileEmail" class="text-xs opacity-60 truncate">usuario@correo.com</p>
+            </div>
+
+            <div class="p-2">
+                <a href="profile.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-2xl transition text-sm font-bold">
+                    <span class="text-lg"></span> Mi Perfil
+                </a>
+
+                <!-- BOTÓN INVENTARIO SOLO PARA ADMIN -->
+                <a id="adminInventoryBtn" href="inventory.html" class="hidden flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-2xl transition text-sm font-bold">
+                    <span class="text-lg"></span> Gestión de Inventario
+                </a>
+
+                <div class="h-px bg-gray-100 my-1 mx-2"></div>
+
+                <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-500 rounded-2xl transition text-sm font-bold text-left">
+                    <span class="text-lg"></span> Cerrar Sesión
+                </button>
+             </div>
+        </div>
+    </div>
+</div>
+
+    </div>
+</nav>
+
+
+<main class="flex-grow pt-36 pb-12 px-6">
+    <div class="max-w-[1200px] mx-auto">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+            <div>
+                <h1 class="text-4xl font-black text-navy_dark tracking-tight">Catálogo Médico</h1>
+                <p class="text-gray-500 mt-1 font-medium">Suministros certificados para tu salud y bienestar.</p>
+            </div>
+        </div>
+
+        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="col-span-full text-center py-24">
+                <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-brand_lime mx-auto"></div>
+                <p class="mt-4 text-gray-400 font-medium">Cargando catálogo...</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div id="cartSidebar" class="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-white shadow-2xl transform translate-x-full transition-transform duration-500 z-[60] flex flex-col">
+    <div class="p-6 bg-navy_dark text-white flex justify-between items-center">
+        <div>
+            <h2 class="text-xl font-black flex items-center gap-2">Resumen</h2>
+            <p class="text-[10px] text-brand_lime font-bold uppercase tracking-widest opacity-80">MediConnect Checkout</p>
+        </div>
+        <button onclick="toggleCart()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors text-2xl">&times;</button>
+    </div>
+    
+    <div id="cartItems" class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/50"></div>
+
+    <div class="p-6 border-t border-gray-100 bg-white">
+        <div class="flex justify-between items-end mb-6">
+            <span class="text-gray-400 font-bold text-xs uppercase tracking-tighter">Total a pagar</span>
+            <span id="cartTotal" class="text-3xl font-black text-navy_dark leading-none">$0.00</span>
+        </div>
+        
+        <div class="space-y-3">
+            <button class="w-full bg-brand_lime hover:bg-brand_lime_dark text-navy_dark font-extrabold py-4 rounded-2xl transition-all shadow-lg shadow-brand_lime/25 flex items-center justify-center gap-2" onclick="checkoutCart()">
+                Confirmar Pedido <span>→</span>
+            </button>
+            
+            <button onclick="clearCart()" class="w-full py-2 text-[10px] font-black text-gray-400 hover:text-red-500 transition-colors uppercase tracking-[0.2em] flex items-center justify-center gap-2">
+                ✕ Vaciar Carrito
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+const API_URL = 'https://backend-mediconnet.onrender.com/api';
+let allProducts = [];
+let cart = { items: [] };
+
+// ===== LOCALSTORAGE: cargar carrito =====
+if(localStorage.getItem('cart')) {
+    try { cart = JSON.parse(localStorage.getItem('cart')); } 
+    catch(e) { cart = { items: [] }; }
+}
+
+// --- PRODUCTOS ---
+async function fetchProducts() {
+    try {
+        const res = await fetch(`${API_URL}/products`);
+        allProducts = await res.json();
+        renderProducts(allProducts);
+    } catch(err) {
+        console.error(err);
+        document.getElementById('productsGrid').innerHTML = `<p class="text-red-500 text-center col-span-full font-bold">Error de conexión.</p>`;
+    }
+}
+
+function renderProducts(products) {
+    const grid = document.getElementById('productsGrid');
+    grid.innerHTML = '';
+    products.forEach(p => {
+        const imgUrl = p.image || 'https://placehold.co/400x300/e2e8f0/102A32?text=MediConnect';
+        grid.innerHTML += `
+        <div class="bg-white rounded-[32px] overflow-hidden product-card flex flex-col h-full relative group">
+            <div class="absolute top-4 left-4 bg-navy_dark/90 text-white text-[9px] font-black px-2.5 py-1 rounded-lg z-10 uppercase tracking-widest">${p.codigo}</div>
+            <div class="h-56 img-container flex items-center justify-center p-8">
+                <img src="${imgUrl}" class="h-full object-contain group-hover:scale-110 transition-transform duration-700 mix-blend-multiply">
+            </div>
+            <div class="p-6 flex flex-col flex-grow">
+                <h3 class="font-bold text-navy_dark text-lg mb-2">${p.name}</h3>
+                <p class="text-gray-400 text-xs line-clamp-2 mb-6">${p.description || 'Calidad certificada.'}</p>
+                <div class="flex items-center justify-between mt-auto pt-5 border-t border-gray-50">
+                    <span class="text-2xl font-black text-navy_dark">$${p.price.toFixed(2)}</span>
+                    <button onclick="addToCart('${p._id}')" class="bg-brand_lime hover:bg-navy_dark hover:text-white text-navy_dark w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-md active:scale-90 font-bold text-2xl">+</button>
+                </div>
+            </div>
+        </div>`;
+    });
+}
+
+// ===== CARRITO =====
+function saveCartToLocal() { localStorage.setItem('cart', JSON.stringify(cart)); }
+
+function updateCartUI() {
+    const totalQty = cart.items?.reduce((acc, item) => acc + item.quantity, 0) || 0;
+    document.getElementById('cartCountMobile').innerText = totalQty;
+    document.getElementById('cartCountDesktop').innerText = totalQty;
+
+    const cartContainer = document.getElementById('cartItems');
+    const totalContainer = document.getElementById('cartTotal');
+
+    if (!cart.items || cart.items.length === 0) {
+        cartContainer.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-20 text-gray-300">
+                <span class="text-6xl mb-4 opacity-10">🛒</span>
+                <p class="font-bold">Carrito vacío</p>
+            </div>`;
+        totalContainer.innerText = '$0.00';
+        saveCartToLocal();
+        return;
+    }
+
+    let html = '';
+    let totalPrice = 0;
+    cart.items.forEach(item => {
+        const subtotal = item.product.price * item.quantity;
+        totalPrice += subtotal;
+        html += `
+        <div class="flex gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+            <div class="w-16 h-16 bg-gray-50 rounded-xl flex-shrink-0 flex items-center justify-center">
+                <img src="${item.product.image || 'https://placehold.co/100'}" class="h-full object-contain mix-blend-multiply">
+            </div>
+            <div class="flex-1 min-w-0">
+                <h4 class="font-bold text-sm text-navy_dark truncate">${item.product.name}</h4>
+                <div class="flex justify-between items-center mt-3">
+                    <div class="flex items-center bg-gray-100 rounded-lg p-0.5 border border-gray-200">
+                        <button onclick="updateQuantity('${item.product._id}', ${item.quantity - 1})" class="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm hover:text-red-500 font-bold">-</button>
+                        <span class="px-3 text-xs font-black">${item.quantity}</span>
+                        <button onclick="updateQuantity('${item.product._id}', ${item.quantity + 1})" class="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm hover:text-brand_lime_dark font-bold">+</button>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-navy_dark font-black text-sm">$${subtotal.toFixed(2)}</p>
+                        <button onclick="removeFromCart('${item._id}')" class="text-[10px] text-red-400 font-bold hover:underline">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    });
+
+    cartContainer.innerHTML = html;
+    totalContainer.innerText = '$' + totalPrice.toFixed(2);
+    saveCartToLocal();
+}
+
+// ===== FUNCIONES CARRITO =====
+async function addToCart(id) {
+    // Generar _id único y reiniciar cantidad correctamente
+    const product = allProducts.find(p => p._id === id);
+    if(!product) return;
+
+    const existing = cart.items.find(i => i.product._id === id);
+    if(existing){
+        existing.quantity++;
+    } else {
+        cart.items.push({ _id: crypto.randomUUID(), product, quantity: 1 });
+    }
+
+    updateCartUI();
+    toggleCart(true);
+
+    // Si hay token, sincronizamos backend
+    const token = localStorage.getItem('token');
+    if(token){
+        try{
+            await fetch(`${API_URL}/cart/add`, {
+                method:'POST',
+                headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`},
+                body: JSON.stringify({productId:id, quantity:1})
+            });
+        } catch(err){ console.error(err); }
+    }
+}
+
+function updateQuantity(productId, quantity){
+    if(quantity<1) return;
+    const item = cart.items.find(i=>i.product._id===productId);
+    if(item){ item.quantity = quantity; updateCartUI(); }
+}
+
+function removeFromCart(cartItemId){ cart.items = cart.items.filter(i=>i._id!==cartItemId); updateCartUI(); }
+
+function clearCart(){ 
+    if(confirm('¿Deseas eliminar permanentemente todos los productos del carrito?')){
+        cart = { items: [] };
+        updateCartUI(); 
+    } 
+}
+
+function toggleCart(forceOpen=false){ 
+    const sidebar = document.getElementById('cartSidebar'); 
+    if(forceOpen) sidebar.classList.remove('translate-x-full'); 
+    else sidebar.classList.toggle('translate-x-full'); 
+}
+
+document.getElementById('searchInput').addEventListener('input', e=>{
+    const term=e.target.value.toLowerCase();
+    const filtered=allProducts.filter(p=>p.name.toLowerCase().includes(term)||p.codigo.toLowerCase().includes(term));
+    renderProducts(filtered);
+});
+
+function checkoutCart(){ alert('Redirigiendo a pago seguro...'); }
+
+fetchProducts();
+updateCartUI(); // cargamos UI desde localStorage
+
+function toggleUserMenu(){
+    const menu = document.getElementById('userMenu');
+    menu.classList.toggle('hidden');
+}
+
+// Cerrar menú al hacer click fuera
+document.addEventListener('click', (e)=>{
+    const menu = document.getElementById('userMenu');
+    const avatar = document.getElementById('userAvatar');
+    if(!menu || !avatar) return;
+    if(!menu.contains(e.target) && !avatar.parentElement.contains(e.target)){
+        menu.classList.add('hidden');
+    }
+});
+
+// Cargar datos del usuario
+function loadUserNav(){
+    const user = JSON.parse(localStorage.getItem('user'));
+    if(!user) return;
+
+    document.getElementById('userNameNav').innerText = user.name;
+    document.getElementById('profileName').innerText = user.name;
+    document.getElementById('profileEmail').innerText = user.email;
+
+    // Avatar con iniciales
+    const initials = user.name.split(' ').map(w=>w[0]).join('').substring(0,2);
+    document.getElementById('userAvatar').innerText = initials;
+}
+
+function logout(){
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = 'login.html';
+}
+
+loadUserNav();
+
+// Supongamos que tu token contiene info del usuario o la recuperas de tu API
+    const user = JSON.parse(localStorage.getItem('user')) || {}; // { name, email, role }
+
+    // Mostrar botón solo si es admin
+    if(user.role === 'admin') {
+        document.getElementById('adminInventoryBtn').classList.remove('hidden');
+    }
+
+    // Función toggle menu
+    function toggleUserMenu() {
+        const menu = document.getElementById('userMenu');
+        menu.classList.toggle('hidden');
+    }
+
+    // Función logout
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'index.html';
+    }
+
+    // Inicializar info del usuario
+    document.getElementById('userNameNav').innerText = user.name || 'Usuario';
+    document.getElementById('profileName').innerText = user.name || 'Nombre Usuario';
+    document.getElementById('profileEmail').innerText = user.email || 'usuario@correo.com';
+</script>
+</body>
+</html>

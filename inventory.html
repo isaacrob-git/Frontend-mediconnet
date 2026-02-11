@@ -1,0 +1,400 @@
+<!DOCTYPE html> 
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin | MediConnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand_lime: '#D1F09B',
+                        brand_lime_dark: '#B8E07D',
+                        navy_dark: '#102A32',
+                        navy_deep: '#0A1F26',
+                        danger: '#EF4444'
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #F8FAFC; font-family: 'Inter', sans-serif; }
+        .glass-header { background: rgba(16, 42, 50, 0.98); backdrop-filter: blur(10px); }
+        .custom-shadow { box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05); }
+        #adminProductsBody tr { transition: all 0.2s; }
+        #adminProductsBody tr:hover { background-color: #f8fafc; }
+    </style>
+</head>
+<body class="text-navy_dark">
+
+<header class="glass-header text-white py-6 px-8 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-4 w-full md:w-auto">
+            <a href="catalogo.html" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-brand_lime hover:text-navy_dark transition-all"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+</svg>
+</a>
+            <div>
+                <h1 class="text-2xl font-black tracking-tighter leading-none">Gestión de Inventario</h1>
+                <p class="text-[10px] text-brand_lime font-bold uppercase tracking-widest mt-1">MediConnect Admin</p>
+            </div>
+        </div>
+
+        <div class="w-full md:max-w-md relative">
+            <input type="text" id="adminSearch" placeholder="Buscar por nombre o código" 
+                class="w-full bg-white/10 border border-white/10 rounded-2xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:border-brand_lime transition-all">
+            <span class="absolute left-3.5 top-3.5 opacity-40"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5"> <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd" /> </svg></span>
+        </div>
+        
+         <div class="hidden md:flex items-center gap-2 ml-2">
+             <!-- BOTÓN CARRITO -->
+            <button onclick="openCreateModal()" class="bg-brand_lime text-navy_dark px-6 py-3 rounded-2xl font-black text-xs hover:scale-105 transition-all shadow-lg shadow-brand_lime/20 uppercase tracking-widest">
+            + Nuevo Producto
+            </button>
+
+            <!-- BOTÓN USUARIO -->
+            <div class="relative">
+                <button onclick="toggleUserMenu()" class="flex items-center gap-2 p-1 pr-3 bg-white/5 hover:bg-white/10 rounded-full transition border border-white/10">
+                    <div id="userAvatar" class="w-8 h-8 bg-brand_lime_dark rounded-full flex items-center justify-center text-navy_dark font-bold text-xs uppercase"></div>
+                    <span id="userNameNav" class="text-xs font-bold hidden md:inline">Cargando...</span>
+                </button>
+
+                <div id="userMenu" class="hidden absolute right-0 mt-3 w-64 bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 text-navy_dark z-[100]">
+                    <div class="p-6 bg-navy_dark text-white">
+                        <p class="text-[10px] font-black text-brand_lime uppercase tracking-[0.2em] mb-1">Bienvenido</p>
+                        <h4 id="profileName" class="font-bold text-lg leading-tight truncate">Nombre Usuario</h4>
+                        <p id="profileEmail" class="text-xs opacity-60 truncate">usuario@correo.com</p>
+                    </div>
+
+                    <div class="p-2">
+                        <a href="profile.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-2xl transition text-sm font-bold">
+                            <span class="text-lg"></span> Mi Perfil
+                        </a>
+
+                        <div class="h-px bg-gray-100 my-1 mx-2"></div>
+
+                        <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-500 rounded-2xl transition text-sm font-bold text-left">
+                            <span class="text-lg"></span> Cerrar Sesión
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto p-8">
+    <div class="bg-white rounded-[32px] overflow-hidden custom-shadow border border-gray-100">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-gray-50/50 border-b border-gray-100">
+                        <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Producto</th>
+                        <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Código</th>
+                        <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Precio</th>
+                        <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="adminProductsBody" class="divide-y divide-gray-50">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<div id="productModal" class="fixed inset-0 bg-navy_dark/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-[40px] overflow-hidden shadow-2xl scale-95 transition-transform">
+        <div class="p-8 bg-navy_dark text-white flex justify-between items-center">
+            <h2 id="modalTitle" class="text-2xl font-black">Producto</h2>
+            <button onclick="closeModal()" class="text-3xl opacity-50 hover:opacity-100 hover:text-brand_lime">&times;</button>
+        </div>
+        
+        <form id="productForm" class="p-8 space-y-5">
+            <input type="hidden" id="productId">
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Nombre</label>
+                    <input type="text" id="name" required class="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 px-4 focus:border-brand_lime outline-none">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Código</label>
+                    <input type="text" id="codigo" readonly 
+                    class="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 px-4 focus:border-brand_lime outline-none">
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Precio ($)</label>
+                    <input type="number" step="0.01" id="price" required class="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 px-4 focus:border-brand_lime outline-none">
+                </div>
+            </div>
+
+            <div class="col-span-2">
+                <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Imagen del Producto</label>
+                <div class="flex items-center gap-4 bg-gray-50 p-4 rounded-3xl border border-gray-100">
+                    <div id="imagePreviewContainer" class="w-20 h-20 bg-white rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <img id="imgPreview" src="" class="hidden h-full w-full object-contain">
+                        <span id="imgPlaceholder" class="text-[10px] text-gray-300 font-bold">Sin foto</span>
+                    </div>
+                    <div class="flex-1">
+                        <input type="file" id="imageInput" accept="image/*" class="hidden">
+                        <button type="button" onclick="document.getElementById('imageInput').click()" 
+                            class="bg-navy_dark text-white text-[10px] font-black py-3 px-4 rounded-xl hover:bg-brand_lime hover:text-navy_dark transition-all uppercase tracking-widest">
+                            Seleccionar de PC
+                        </button>
+                        <p id="fileName" class="text-[10px] text-gray-400 mt-2 truncate max-w-[180px]">No hay archivo</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="text-[10px] font-black text-gray-400 uppercase mb-2 block">Descripción</label>
+                <textarea id="description" rows="2" class="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 px-4 focus:border-brand_lime outline-none resize-none"></textarea>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="button" onclick="closeModal()" class="flex-1 py-4 font-bold text-gray-400">Cancelar</button>
+                <button type="submit" class="flex-[2] bg-brand_lime text-navy_dark py-4 rounded-2xl font-black shadow-lg hover:bg-brand_lime_dark transition-all uppercase tracking-widest">
+                    Guardar Producto
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+const API_URL = 'https://backend-mediconnet.onrender.com/api';
+let allProducts = [];
+
+// --- CARGAR PRODUCTOS ---
+async function fetchAdminProducts() {
+    try {
+        const res = await fetch(`${API_URL}/products`);
+        allProducts = await res.json();
+        renderTable(allProducts);
+    } catch (err) { console.error("Error al cargar productos:", err); }
+}
+
+function renderTable(data) {
+    const body = document.getElementById('adminProductsBody');
+    body.innerHTML = data.map(p => `
+        <tr class="border-b border-gray-50">
+            <td class="px-6 py-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center p-1 border border-gray-100">
+                        <img src="${p.image || 'https://placehold.co/40'}" class="h-full object-contain mix-blend-multiply">
+                    </div>
+                    <span class="font-bold text-sm text-navy_dark">${p.name}</span>
+                </div>
+            </td>
+            <td class="px-6 py-4 font-mono text-xs text-gray-400 font-bold">${p.codigo}</td>
+            <td class="px-6 py-4 font-black text-sm">$${p.price.toFixed(2)}</td>
+            <td class="px-6 py-4 text-right space-x-2">
+                <button onclick='openEditModal(${JSON.stringify(p)})' class="p-2.5 hover:bg-brand_lime rounded-xl transition-all"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+  <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
+  <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
+</svg>
+</button>
+                <button onclick="deleteProduct('${p.codigo}')" class="p-2.5 hover:bg-red-50 text-red-500 rounded-xl transition-all"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+  <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd" />
+</svg>
+</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// --- LÓGICA DE IMAGEN ---
+document.getElementById('imageInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('imgPreview');
+    const placeholder = document.getElementById('imgPlaceholder');
+    const fileName = document.getElementById('fileName');
+
+    if (file) {
+        fileName.innerText = file.name;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// --- MODALES ---
+async function openCreateModal() {
+    document.getElementById('modalTitle').innerText = "Nuevo Producto";
+    document.getElementById('productForm').reset();
+    document.getElementById('productId').value = "";
+    resetImagePreview();
+
+    // Obtener el próximo código automáticamente
+    try {
+        const res = await fetch(`${API_URL}/products`);
+        const products = await res.json();
+
+        let newCodigo = 'PROD001';
+        if(products.length > 0) {
+            // Ordenamos por createdAt y tomamos el último con código
+            const lastProduct = products
+                .filter(p => p.codigo)
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+            
+            if(lastProduct && lastProduct.codigo) {
+                const lastNumber = parseInt(lastProduct.codigo.replace('PROD','')) || 0;
+                newCodigo = `PROD${(lastNumber + 1).toString().padStart(3,'0')}`;
+            }
+        }
+
+        document.getElementById('codigo').value = newCodigo;
+
+    } catch (err) {
+        console.error("Error al obtener el código automático:", err);
+        document.getElementById('codigo').value = "PRODXXX";
+    }
+
+    document.getElementById('productModal').classList.remove('hidden');
+}
+
+function openEditModal(product) {
+    document.getElementById('modalTitle').innerText = "Editar Producto";
+    document.getElementById('productId').value = product.codigo;
+    document.getElementById('name').value = product.name;
+    document.getElementById('codigo').value = product.codigo;
+    document.getElementById('price').value = product.price;
+    document.getElementById('description').value = product.description || "";
+    
+    const preview = document.getElementById('imgPreview');
+    const placeholder = document.getElementById('imgPlaceholder');
+    
+    if(product.image) {
+        preview.src = product.image;
+        preview.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+        document.getElementById('fileName').innerText = "Imagen actual cargada";
+    } else {
+        resetImagePreview();
+    }
+    
+    document.getElementById('productModal').classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('productModal').classList.add('hidden');
+}
+
+function resetImagePreview() {
+    document.getElementById('imgPreview').src = "";
+    document.getElementById('imgPreview').classList.add('hidden');
+    document.getElementById('imgPlaceholder').classList.remove('hidden');
+    document.getElementById('fileName').innerText = "No hay archivo";
+    document.getElementById('imageInput').value = "";
+}
+
+// --- CRUD ACTIONS ---
+document.getElementById('productForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const code = document.getElementById('productId').value;
+    const fileInput = document.getElementById('imageInput');
+    
+    const formData = new FormData();
+    formData.append('name', document.getElementById('name').value);
+    formData.append('price', document.getElementById('price').value);
+    formData.append('description', document.getElementById('description').value);
+    
+    if (fileInput.files[0]) {
+        formData.append('image', fileInput.files[0]);
+    }
+
+    const method = code ? 'PUT' : 'POST';
+    const url = code ? `${API_URL}/products/${code}` : `${API_URL}/products`;
+
+    try {
+        const res = await fetch(url, {
+            method,
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+            body: formData
+        });
+
+        if (res.ok) {
+            closeModal();
+            fetchAdminProducts();
+            alert(code ? 'Producto actualizado' : 'Producto creado');
+        } else {
+            alert('Error al guardar el producto.');
+        }
+    } catch (err) { console.error(err); }
+};
+
+async function deleteProduct(code) {
+    if (!confirm('¿Eliminar este producto permanentemente?')) return;
+    try {
+        await fetch(`${API_URL}/products/${code}`, { 
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        fetchAdminProducts();
+    } catch (err) { console.error(err); }
+}
+
+// BUSCADOR
+document.getElementById('adminSearch').addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    const filtered = allProducts.filter(p => 
+        p.name.toLowerCase().includes(term) || 
+        p.codigo.toLowerCase().includes(term)
+    );
+    renderTable(filtered);
+});
+
+fetchAdminProducts();
+
+function toggleUserMenu(){
+    const menu = document.getElementById('userMenu');
+    menu.classList.toggle('hidden');
+}
+
+// Cerrar menú al hacer click fuera
+document.addEventListener('click', (e)=>{
+    const menu = document.getElementById('userMenu');
+    const avatar = document.getElementById('userAvatar');
+    if(!menu || !avatar) return;
+    if(!menu.contains(e.target) && !avatar.parentElement.contains(e.target)){
+        menu.classList.add('hidden');
+    }
+});
+
+// Cargar datos del usuario
+function loadUserNav(){
+    const user = JSON.parse(localStorage.getItem('user'));
+    if(!user) return;
+
+    document.getElementById('userNameNav').innerText = user.name;
+    document.getElementById('profileName').innerText = user.name;
+    document.getElementById('profileEmail').innerText = user.email;
+
+    // Avatar con iniciales
+    const initials = user.name.split(' ').map(w=>w[0]).join('').substring(0,2);
+    document.getElementById('userAvatar').innerText = initials;
+}
+
+function logout(){
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = 'index.html';
+}
+
+loadUserNav();
+
+</script>
+</body>
+</html>

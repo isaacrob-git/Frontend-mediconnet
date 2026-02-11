@@ -1,0 +1,45 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+/* HERO SECTION */
+.hero-overlay {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(rgba(10, 31, 38, 0.75), rgba(10, 31, 38, 0.85)), 
+                url('img/fondo2.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* COMPONENTES */
+.btn-pill {
+    transition: all 0.3s ease;
+}
+
+.btn-pill:hover {
+    transform: translateY(-2px) scale(1.02);
+}
+
+.rounded-card {
+    border-radius: 20px;
+}
+
+#mainNav {
+    transition: all 0.4s ease;
+}
+
+#btnLogin:hover {
+    background: rgba(209, 240, 155, 0.1);
+}

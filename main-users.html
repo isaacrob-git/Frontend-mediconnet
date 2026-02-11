@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediConnect C.A. | Telemedicina de Vanguardia</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand_lime: '#D1F09B',
+                        brand_lime_dark: '#B8E07D',
+                        navy_dark: '#102A32',
+                        navy_deep: '#0A1F26',
+                        off_white: '#F4F4F2',
+                        neutral_text: '#526268'
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    borderRadius: { 'button': '24px', 'card': '20px', 'section': '24px' }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hero-overlay {
+            background: linear-gradient(rgba(16, 42, 50, 0.8), rgba(16, 42, 50, 0.9)), 
+                        url('img/fondo.png');
+            background-size: cover; background-position: center;
+        }
+               /* EFECTO DE FUSIÓN PARA LA IMAGEN DEL STORE */
+        .store-image-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: url('img/store-preview.jpg'); /* Asegúrate de tener esta imagen */
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Degradado para fundir la imagen con el fondo navy_dark */
+        .store-fusion-mask {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, #102A32 0%, transparent 20%, transparent 80%, #102A32 100%),
+                        linear-gradient(to top, #102A32 0%, transparent 15%);
+        }
+
+        @media (max-width: 1024px) {
+            .store-fusion-mask {
+                background: linear-gradient(to bottom, #102A32 0%, transparent 20%, transparent 80%, #102A32 100%);
+            }
+        }
+    </style>
+</head>
+<body class="bg-white text-navy_dark font-sans hidden" id="appBody"">
+
+<nav id="mainNav" class="fixed top-0 w-full z-50 transition-all duration-300 px-6 h-16 flex items-center">
+    <div class="max-w-[1200px] mx-auto w-full flex justify-between items-center">
+        <a href="#" class="text-xl font-extrabold tracking-tighter flex items-center gap-2" id="navLogo">
+            <div class="w-6 h-6 bg-brand_lime rounded-sm"></div>
+            <span class="text-white transition-colors duration-300" id="navTitle">MediConnect</span>
+        </a>
+        
+        <div class="hidden md:flex items-center gap-6 text-[14px] font-semibold" id="navLinksContainer">
+            <div class="flex gap-6 mr-4" id="navLinks">
+                <a href="#inicio" class="text-white/90 hover:text-brand_lime transition">Inicio</a>
+                <a href="#nosotros" class="text-white/90 hover:text-brand_lime transition">Nosotros</a>
+                <a href="#servicios" class="text-white/90 hover:text-brand_lime transition">MediConnect Store</a>
+                <a href="#contacto" class="text-white/90 hover:text-brand_lime transition">Soporte</a>
+            </div>
+            
+            <div class="relative">
+                <button onclick="toggleUserMenu()" class="flex items-center gap-2 p-1 pr-3 bg-white/5 hover:bg-white/10 rounded-full transition border border-white/10 text-white" id="userBtnShell">
+                    <div id="userAvatar" class="w-8 h-8 bg-brand_lime rounded-full flex items-center justify-center text-navy_dark font-bold text-xs uppercase">U</div>
+                    <span id="userNameNav" class="text-xs font-bold hidden md:inline">Cargando...</span>
+                </button>
+
+                <div id="userMenu" class="hidden absolute right-0 mt-3 w-64 bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 text-navy_dark z-[100]">
+                    <div class="p-6 bg-navy_dark text-white">
+                        <p class="text-[10px] font-black text-brand_lime uppercase tracking-[0.2em] mb-1">Bienvenido</p>
+                        <h4 id="profileName" class="font-bold text-lg leading-tight truncate">Usuario</h4>
+                        <p id="profileEmail" class="text-xs opacity-60 truncate">usuario@correo.com</p>
+                    </div>
+                    <div class="p-2">
+                        
+                        <a href="profile.html" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-2xl transition text-sm font-bold">
+                    <span class="text-lg"></span> Mi Perfil
+                </a>
+
+                <!-- BOTÓN INVENTARIO SOLO PARA ADMIN -->
+                <a id="adminInventoryBtn" href="inventory.html" class="hidden flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-2xl transition text-sm font-bold">
+                    <span class="text-lg"></span> Gestión de Inventario
+                </a>
+
+                <div class="h-px bg-gray-100 my-1 mx-2"></div>
+
+                <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-500 rounded-2xl transition text-sm font-bold text-left">
+                    <span class="text-lg"></span> Cerrar Sesión
+                </button>
+            
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section id="inicio" class="hero-overlay relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden">
+    <div class="relative z-10 max-w-[800px] text-center text-white px-6">
+        <h1 class="text-[40px] md:text-[56px] font-extrabold mb-6 leading-tight tracking-tight">Salud conectada para una nueva era</h1>
+        <p class="text-[18px] md:text-[20px] text-gray-300 mb-10 leading-relaxed max-w-2xl mx-auto">MediConnect C.A. integra tecnología y medicina en una plataforma accesible, rápida y segura.</p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="catalogo.html" class="border-2 border-brand_lime text-brand_lime px-10 py-4 rounded-full font-bold hover:bg-brand_lime/10 transition text-lg">MediConnect Store</a>
+        </div>
+    </div>
+</section>
+
+<section id="nosotros" class="py-24 bg-off_white">
+    <div class="max-w-[1200px] mx-auto px-6">
+        <div class="flex flex-col md:flex-row gap-12">
+            <div class="md:w-1/3">
+                <h2 class="text-[32px] font-bold text-navy_dark leading-tight">Nuestra esencia institucional</h2>
+                <p class="text-neutral_text mt-4 font-medium">En MediConnect C.A., la tecnología no es el fin, sino el medio para cuidar de lo más importante: tu vida.</p>
+            </div>
+            <div class="md:w-2/3 grid sm:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-card shadow-sm border border-gray-100">
+                    <h3 class="text-[20px] font-bold text-navy_dark mb-3">Misión</h3>
+                    <p class="text-neutral_text text-sm leading-relaxed">Brindar soluciones tecnológicas innovadoras que faciliten el acceso a servicios médicos de calidad mediante la atención remota...</p>
+                </div>
+                <div class="bg-white p-8 rounded-card shadow-sm border border-gray-100">
+                    <h3 class="text-[20px] font-bold text-navy_dark mb-3">Visión</h3>
+                    <p class="text-neutral_text text-sm leading-relaxed">Consolidarse como la plataforma líder en telemedicina en América Latina, reconocida por su compromiso con la innovación...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="servicios" class="pt-24 pb-12 bg-white px-6">
+    <div class="max-w-[1200px] mx-auto text-center">
+        <span class="text-brand_lime_dark font-bold tracking-widest text-xs uppercase italic">Ecosistema Digital</span>
+        <h2 class="text-[32px] md:text-[42px] font-extrabold text-navy_dark mb-16">Nuestra WebApp</h2>
+
+        <div class="relative w-full rounded-[40px] overflow-hidden bg-navy_dark text-white flex flex-col lg:flex-row items-stretch min-h-[550px] shadow-2xl">
+            <div class="lg:w-1/2 p-12 md:p-16 text-left flex flex-col justify-center relative z-10 bg-navy_dark">
+                <div class="inline-block px-4 py-1 rounded-full bg-brand_lime/10 border border-brand_lime/20 text-brand_lime text-xs font-bold mb-6 uppercase tracking-widest">MediConnect Store</div>
+                <h2 class="text-[36px] md:text-[48px] font-black leading-tight mb-6 tracking-tighter">Equipamiento médico <br> a un click de distancia.</h2>
+                <p class="text-gray-400 text-lg mb-10 leading-relaxed max-w-md">
+                    Adquiere insumos, medicamentos y equipos de monitoreo con la confianza de MediConnect. Envíos directos a tu hogar.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="catalogo.html" class="bg-brand_lime text-navy_dark px-8 py-4 rounded-full font-bold btn-pill hover:shadow-xl hover:shadow-brand_lime/20 transition-all">Visitar Tienda Online</a>
+                </div>
+            </div>
+            
+            <div class="lg:w-1/2 w-full min-h-[350px] relative overflow-hidden">
+                <div class="store-image-container">
+                    <div class="store-fusion-mask"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="contacto" class="py-24 bg-white">
+    <div class="max-w-[1200px] mx-auto px-6">
+        <div class="bg-navy_deep rounded-[32px] overflow-hidden flex flex-col md:flex-row shadow-2xl">
+            <div class="md:w-1/2 p-12 bg-navy_dark text-white">
+                <h2 class="text-3xl font-bold mb-6">Soporte Técnico</h2>
+                <p class="text-gray-400 mb-8">¿Tienes dudas sobre nuestra WebApp? Nuestro equipo te responderá en menos de 24 horas.</p>
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4 text-sm">San Sebastián, Aragua, Venezuela.</div>
+                    <div class="flex items-center gap-4 text-sm">contacto@mediconnect.com.ve</div>
+                </div>
+            </div>
+            <div class="md:w-1/2 p-12 bg-white">
+                <form action="mailto:contacto@mediconnect.com.ve" method="POST" enctype="text/plain" class="space-y-4">
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <input type="text" name="Nombre" required class="w-full bg-off_white border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-brand_lime outline-none" placeholder="Nombre">
+                        <input type="email" name="Email" required class="w-full bg-off_white border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-brand_lime outline-none" placeholder="Email">
+                    </div>
+                    <textarea name="Mensaje" rows="4" required class="w-full bg-off_white border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-brand_lime outline-none" placeholder="¿Cómo podemos ayudarte?"></textarea>
+                    <button type="submit" class="w-full bg-navy_dark text-white font-bold py-4 rounded-full hover:bg-brand_lime hover:text-navy_dark transition-colors">Enviar Mensaje</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="bg-navy_dark text-white pt-16 pb-8">
+    <div class="max-w-[1200px] mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+            
+            <div class="space-y-4">
+                <a href="#" class="text-xl font-extrabold tracking-tighter flex items-center gap-2">
+                    <div class="w-6 h-6 bg-brand_lime rounded-sm"></div>
+                    <span class="text-white">MediConnect</span>
+                </a>
+                <p class="text-gray-400 text-sm leading-relaxed">
+                    Telemedicina de vanguardia. Conectamos tecnología y salud para ofrecerte atención médica de calidad donde quiera que estés.
+                </p>
+                <div class="flex gap-4 pt-2">
+                    <a href="#" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-brand_lime hover:text-navy_dark transition-all">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    </a>
+                    <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-brand_lime hover:text-navy_dark transition-all">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.332 3.608 1.308.975.975 1.245 2.242 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.063 1.366-.333 2.633-1.308 3.608-.975.975-2.242 1.246-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.332-3.608-1.308-.975-.975-1.245-2.242-1.308-3.608-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.062-1.366.332-2.633 1.308-3.608.975-.975 2.242-1.308 3.608-1.308 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-brand_lime font-bold mb-6 uppercase text-xs tracking-widest">Navegación</h3>
+                <ul class="space-y-4 text-sm text-gray-400">
+                    <li><a href="#inicio" class="hover:text-white transition">Inicio</a></li>
+                    <li><a href="#nosotros" class="hover:text-white transition">Nosotros</a></li>
+                    <li><a href="consultas.html" class="hover:text-white transition">Consultas Médicas</a></li>
+                    <li><a href="catalog.html" class="hover:text-white transition">MediConnect Store</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-brand_lime font-bold mb-6 uppercase text-xs tracking-widest">Legal</h3>
+                <ul class="space-y-4 text-sm text-gray-400">
+                    <li><a href="#" class="hover:text-white transition">Términos de Servicio</a></li>
+                    <li><a href="#" class="hover:text-white transition">Política de Privacidad</a></li>
+                    <li><a href="#" class="hover:text-white transition">Uso de Cookies</a></li>
+                    <li><a href="#" class="hover:text-white transition">Consentimiento Médico</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-brand_lime font-bold mb-6 uppercase text-xs tracking-widest">Novedades</h3>
+                <p class="text-sm text-gray-400 mb-4">Recibe consejos de salud y actualizaciones tecnológicas.</p>
+                <form class="flex flex-col gap-2">
+                    <input type="email" placeholder="Tu correo electrónico" class="bg-navy_deep border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand_lime">
+                    <button class="bg-brand_lime text-navy_dark font-bold py-2 rounded-lg text-sm hover:bg-brand_lime_dark transition">Suscribirme</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-gray-500 text-xs">
+                © 2026 MediConnect C.A. J-00000000-0. Todos los derechos reservados.
+            </p>
+            <p class="text-gray-500 text-xs flex items-center gap-1">
+                Hecho con <span class="text-red-500">❤️</span> en Venezuela
+            </p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    const nav = document.getElementById('mainNav');
+    const navTitle = document.getElementById('navTitle');
+    const navLinks = document.querySelectorAll('#navLinks a');
+    const userBtnShell = document.getElementById('userBtnShell');
+    const userMenu = document.getElementById('userMenu');
+
+    // Cargar datos de usuario
+    function loadUserData() {
+        const name = localStorage.getItem('userName') || 'Usuario';
+        const email = localStorage.getItem('userEmail') || 'usuario@correo.com';
+        document.getElementById('userNameNav').innerText = name.split(' ')[0];
+        document.getElementById('profileName').innerText = name;
+        document.getElementById('profileEmail').innerText = email;
+        document.getElementById('userAvatar').innerText = name.charAt(0).toUpperCase();
+    }
+
+    function toggleUserMenu() {
+        userMenu.classList.toggle('hidden');
+    }
+
+    function logout() {
+        localStorage.clear();
+        window.location.href = 'login.html';
+    }
+
+    window.addEventListener('scroll', () => {
+        const isScrolling = window.scrollY > 50;
+        nav.classList.toggle('bg-white', isScrolling);
+        nav.classList.toggle('shadow-md', isScrolling);
+        navTitle.style.color = isScrolling ? '#102A32' : '#FFFFFF';
+        userBtnShell.classList.toggle('text-navy_dark', isScrolling);
+        userBtnShell.classList.toggle('text-white', !isScrolling);
+        navLinks.forEach(link => {
+            link.style.color = isScrolling ? '#102A32' : 'rgba(255, 255, 255, 0.9)';
+        });
+    });
+
+    // Cerrar menú al hacer clic fuera
+    window.addEventListener('click', (e) => {
+        if (!userBtnShell.contains(e.target) && !userMenu.contains(e.target)) {
+            userMenu.classList.add('hidden');
+        }
+    });
+
+    loadUserData();
+
+    function toggleUserMenu(){
+    const menu = document.getElementById('userMenu');
+    menu.classList.toggle('hidden');
+}
+
+// Cerrar menú al hacer click fuera
+document.addEventListener('click', (e)=>{
+    const menu = document.getElementById('userMenu');
+    const avatar = document.getElementById('userAvatar');
+    if(!menu || !avatar) return;
+    if(!menu.contains(e.target) && !avatar.parentElement.contains(e.target)){
+        menu.classList.add('hidden');
+    }
+});
+
+// Cargar datos del usuario
+function loadUserNav(){
+    const user = JSON.parse(localStorage.getItem('user'));
+    if(!user) return;
+
+    document.getElementById('userNameNav').innerText = user.name;
+    document.getElementById('profileName').innerText = user.name;
+    document.getElementById('profileEmail').innerText = user.email;
+
+    // Avatar con iniciales
+    const initials = user.name.split(' ').map(w=>w[0]).join('').substring(0,2);
+    document.getElementById('userAvatar').innerText = initials;
+}
+
+function logout(){
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = 'login.html';
+}
+
+loadUserNav();
+
+// Supongamos que tu token contiene info del usuario o la recuperas de tu API
+    const user = JSON.parse(localStorage.getItem('user')) || {}; // { name, email, role }
+
+    // Mostrar botón solo si es admin
+    if(user.role === 'admin') {
+        document.getElementById('adminInventoryBtn').classList.remove('hidden');
+    }
+
+    // Función toggle menu
+    function toggleUserMenu() {
+        const menu = document.getElementById('userMenu');
+        menu.classList.toggle('hidden');
+    }
+
+    // Función logout
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+    }
+
+    // Inicializar info del usuario
+    document.getElementById('userNameNav').innerText = user.name || 'Usuario';
+    document.getElementById('profileName').innerText = user.name || 'Nombre Usuario';
+    document.getElementById('profileEmail').innerText = user.email || 'usuario@correo.com';
+
+    async function checkAuth() {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    try {
+        const res = await fetch('https://backend-mediconnet.onrender.com/api/auth/profile', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!res.ok) {
+            localStorage.clear();
+            window.location.href = 'index.html';
+            return;
+        }
+
+        const user = await res.json();
+        console.log('Usuario autenticado:', user);
+
+        // 👉 Mostrar la página SOLO si pasó la validación
+        document.getElementById('appBody').classList.remove('hidden');
+
+    } catch (error) {
+        localStorage.clear();
+        window.location.href = 'index.html';
+    }
+}
+
+    checkAuth();
+</script>
+
+</body>
+</html>
